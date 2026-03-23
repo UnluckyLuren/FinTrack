@@ -1,0 +1,44 @@
+version: '3.9'
+
+services:
+  # ── PHP + Apache ────────────────────────────────────────────────────────────
+  php:
+    build: .
+    container_name: fintrack_php
+    restart: unless-stopped
+    ports:
+      - "8080:80"          # Puerto local → puedes cambiarlo
+    volumes:
+      - .:/var/www/html    # Monta backend/ como raíz del servidor
+      - ./uploads:/var/www/html/uploads
+    environment:
+      DB_HOST:     mysql
+      DB_NAME:     fintrack
+      DB_USER:     fintrack_user
+      DB_PASSWORD: fintrack_pass_2026
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  # ── MySQL 8 ─────────────────────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: fintrack_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_pass_2026
+      MYSQL_DATABASE:      fintrack
+      MYSQL_USER:          fintrack_user
+      MYSQL_PASSWORD:      fintrack_pass_2026
+    volumes:
+      - mysql_data:/var/lib/mysql     # Datos persistentes
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost",
+             "-u", "fintrack_user", "-pfintrack_pass_2026"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:

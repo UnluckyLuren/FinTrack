@@ -1,0 +1,11 @@
+# cloudflare-tunnel.yml
+# Este archivo va en tu ThinkPad, NO en el repo.
+# Instrucciones en el README.
+
+tunnel: TU_TUNNEL_ID_AQUI
+credentials-file: /root/.cloudflared/TU_TUNNEL_ID_AQUI.json
+
+ingress:
+  - hostname: api-fintrack.tudominio.com
+    service: http://localhost:8080
+  - service: http_status:404

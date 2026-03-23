@@ -1,0 +1,17 @@
+Options -Indexes
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options DENY
+
+# Rewrite para que las peticiones sin .php funcionen también
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+</IfModule>
+
+# Bloquear ejecución de PHP en uploads
+<Directory "uploads">
+    Options -ExecCGI
+    php_flag engine off
+    <FilesMatch "\.(php|phtml|php3|php4|php5|phps)$">
+        Deny from all
+    </FilesMatch>
+</Directory>
