@@ -99,9 +99,8 @@ switch ($action) {
             $stmt->execute([$correo, $hash]);
             $idUsuario = $db->lastInsertId();
             
-            // 3. Crear una cuenta (billetera) base
-    
-            $stmtCuenta = $db->prepare("INSERT INTO cuentas (id_usuario, tipo, nombre_institucion, saldo_actual) VALUES (?, 'débito', 'Mi Billetera', 0)");
+            // 3. Crear una cuenta (billetera) base (MySQL asignará el 'tipo' por defecto)
+            $stmtCuenta = $db->prepare("INSERT INTO cuentas (id_usuario, nombre_institucion, saldo_actual) VALUES (?, 'Mi Billetera', 0)");
             $stmtCuenta->execute([$idUsuario]);
             
             // 4. Iniciar sesión automáticamente
