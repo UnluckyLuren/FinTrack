@@ -95,7 +95,7 @@ switch ($action) {
             
             // 2. Insertar usuario de forma segura
             $hash = password_hash($pass, PASSWORD_BCRYPT);
-            $stmt = $db->prepare("INSERT INTO usuarios (correo_electronico, password_hash) VALUES (?, ?)");
+            $stmt = $db->prepare("INSERT INTO usuarios (correo_electronico, hash_contrasena) VALUES (?, ?)");
             $stmt->execute([$correo, $hash]);
             $idUsuario = $db->lastInsertId();
             
