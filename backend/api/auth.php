@@ -60,32 +60,43 @@ switch ($action) {
         $u = (new Usuario())->findById($user['id_usuario']);
         Response::success($u ? $u->toArray() : null);
         break;
-
+        
     // ── REGISTER ─────────────────────────────────────────────
     case 'register':
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') Response::error('Método no permitido', 405);
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Método no permitido', 405);
+            exit;
+        }
         
         $body  = Response::body();
         $correo= trim($body['correo'] ?? '');
         $pass  = $body['password'] ?? '';
         
-        if (empty($correo) || empty($pass)) Response::error('Correo y contraseña requeridos.');
-        if (strlen($pass) < 8) Response::error('La contraseña debe tener mínimo 8 caracteres.');
-        
-        $db = Database::getInstance()->getConnection();
-        
-        // 1. Evitar correos duplicados
-        $stmt = $db->prepare("SELECT id_usuario FROM usuarios WHERE correo_electronico = ?");
-        $stmt->execute([$correo]);
-        if ($stmt->fetch()) {
-            Response::error('El correo ya está registrado.', 409);
+        if (empty($correo) || empty($pass)) {
+            Response::error('Correo y contraseña requeridos.');
+            exit;
+        }
+        if (strlen($pass) < 8) {
+            Response::error('La contraseña debe tener mínimo 8 caracteres.');
+            exit;
         }
         
-        // 2. Insertar usuario de forma segura
-        $hash = password_hash($pass, PASSWORD_BCRYPT);
-        $stmt = $db->prepare("INSERT INTO usuarios (correo_electronico, password_hash) VALUES (?, ?)");
-        
-        if ($stmt->execute([$correo, $hash])) {
+        try {
+            $db = Database::getInstance()->getConnection();
+            
+            // 1. Evitar correos duplicados
+            $stmt = $db->prepare("SELECT id_usuario FROM usuarios WHERE correo_electronico = ?");
+            $stmt->execute([$correo]);
+            if ($stmt->fetch()) {
+                // AQUÍ ESTABA EL BUG: Faltaba el exit para detener a PHP
+                Response::error('El correo ya está registrado.', 409);
+                exit; 
+            }
+            
+            // 2. Insertar usuario de forma segura
+            $hash = password_hash($pass, PASSWORD_BCRYPT);
+            $stmt = $db->prepare("INSERT INTO usuarios (correo_electronico, password_hash) VALUES (?, ?)");
+            $stmt->execute([$correo, $hash]);
             $idUsuario = $db->lastInsertId();
             
             // 3. Crear una cuenta (billetera) base
@@ -105,8 +116,12 @@ switch ($action) {
                     'ultimo_acceso' => date('Y-m-d H:i:s')
                 ]
             ], 'Usuario creado.', 201);
-        } else {
-            Response::error('Error al guardar en la base de datos.', 500);
+            exit;
+            
+        } catch (PDOException $e) {
+            // Si la base de datos se queja, lo devolvemos como JSON limpio
+            Response::error('Error interno de BD: ' . $e->getMessage(), 500);
+            exit;
         }
         break;
 
