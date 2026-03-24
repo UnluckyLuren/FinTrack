@@ -167,6 +167,7 @@ const App = (() => {
   let _movTipo = 'gasto';
   let _pendingOCR = null;
   let _cats = [];
+  let _isLogin = true;
 
   const TITLES = {
     dashboard:'Dashboard',transacciones:'Transacciones',
@@ -203,7 +204,20 @@ const App = (() => {
       ['login-email','login-pass'].forEach(id=>{
         document.getElementById(id)?.addEventListener('keypress',e=>{if(e.key==='Enter')this.handleLogin();});
       });
+
+      document.getElementById('toggle-auth-mode')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        _isLogin = !_isLogin;
+        document.getElementById('group-pass-confirm')?.classList.toggle('hidden', _isLogin);
+        document.getElementById('btn-login-text').textContent = _isLogin ? 'Iniciar sesión' : 'Crear cuenta';
+        document.querySelector('.login-title').textContent = _isLogin ? 'Bienvenido 👋' : 'Nueva Cuenta 🚀';
+        document.querySelector('.login-sub').textContent = _isLogin ? 'Ingresa tus credenciales para acceder a tu gestor financiero.' : 'Crea tus credenciales para comenzar a gestionar tu dinero.';
+        e.target.textContent = _isLogin ? 'Crear una cuenta nueva' : '¿Ya tienes cuenta? Inicia sesión';
+        ['err-email','err-pass','err-general'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));
+      });
+
       document.getElementById('btn-logout')?.addEventListener('click',this.logout.bind(this));
+
       document.querySelectorAll('.nav-item[data-section]').forEach(btn=>{
         btn.addEventListener('click',()=>{
           this.navigate(btn.dataset.section);
@@ -211,6 +225,7 @@ const App = (() => {
           document.getElementById('sidebar-backdrop')?.classList.remove('open');
         });
       });
+
       document.getElementById('hamburger')?.addEventListener('click',()=>{
         document.getElementById('sidebar')?.classList.toggle('open');
         document.getElementById('sidebar-backdrop')?.classList.toggle('open');
@@ -269,17 +284,32 @@ const App = (() => {
       const btnSpin = document.getElementById('btn-spin');
       const btnLog = document.getElementById('btn-login');
       
-      if(btnTxt) btnTxt.textContent='Verificando...';
+      // --- NUEVA VALIDACIÓN DE REGISTRO ---
+      if(!_isLogin){
+        const passConf = document.getElementById('login-pass-confirm')?.value;
+        if(pass !== passConf){
+          const errG = document.getElementById('err-general');
+          if(errG) { errG.textContent='Las contraseñas no coinciden.'; errG.classList.remove('hidden'); }
+          return;
+        }
+      }
+
+      if(btnTxt) btnTxt.textContent = _isLogin ? 'Verificando...' : 'Creando cuenta...';
       if(btnSpin) btnSpin.classList.remove('hidden');
       if(btnLog) btnLog.disabled=true;
-      
+
       try {
-        const res=await ApiClient.post('auth.php?action=login',{correo:email,password:pass});
-        if(btnTxt) btnTxt.textContent='Iniciar sesión';
+        // --- ENVÍO DINÁMICO ---
+        const endpoint = _isLogin ? 'auth.php?action=login' : 'auth.php?action=register';
+        const res = await ApiClient.post(endpoint, {correo:email, password:pass});
+        // ----------------------
+
+        if(btnTxt) btnTxt.textContent = _isLogin ? 'Iniciar sesión' : 'Crear cuenta';
         if(btnSpin) btnSpin.classList.add('hidden');
         if(btnLog) btnLog.disabled=false;
-        
+
         if(res.success){
+          if(!_isLogin) Toast.show('Cuenta creada exitosamente.','success');
           this._initApp(res.data.usuario);
         } else if(res.error==='bloqueado'){
           document.getElementById('lock-notice')?.classList.remove('hidden');

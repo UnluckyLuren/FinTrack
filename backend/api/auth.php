@@ -76,3 +76,58 @@ switch ($action) {
     default:
         Response::error('Acción no encontrada.', 404);
 }
+
+// NUEVO ENDPOINT DE REGISTRO
+if (isset($_GET['action']) && $_GET['action'] === 'register') {
+    $data = json_decode(file_get_contents("php://input"), true);
+    $correo = trim($data['correo'] ?? '');
+    $pass = $data['password'] ?? '';
+
+    if (empty($correo) || empty($pass)) {
+        echo json_encode(['success' => false, 'error' => 'Datos incompletos.']);
+        exit;
+    }
+    
+    // Obtenemos la conexión desde tu Singleton Database
+    $db = Database::getInstance()->getConnection();
+    
+    // 1. Evitar correos duplicados en MySQL
+    $stmt = $db->prepare("SELECT id_usuario FROM usuarios WHERE correo_electronico = ?");
+    $stmt->execute([$correo]);
+    if ($stmt->fetch()) {
+        echo json_encode(['success' => false, 'error' => 'El correo ya está registrado.']);
+        exit;
+    }
+    
+    // 2. Insertar usuario de forma segura
+    $hash = password_hash($pass, PASSWORD_BCRYPT);
+    $stmt = $db->prepare("INSERT INTO usuarios (correo_electronico, password_hash) VALUES (?, ?)");
+    
+    if ($stmt->execute([$correo, $hash])) {
+        $idUsuario = $db->lastInsertId();
+        
+        // 3. Crear una cuenta (billetera) base para que el Dashboard funcione
+        $stmtCuenta = $db->prepare("INSERT INTO cuentas (id_usuario, tipo, nombre_institucion, saldo_actual) VALUES (?, 'efectivo', 'Mi Billetera', 0)");
+        $stmtCuenta->execute([$idUsuario]);
+        
+        // 4. Iniciar sesión automáticamente
+        Session::setUser([
+            'id_usuario'         => $idUsuario,
+            'correo_electronico' => $correo,
+        ]);
+        
+        echo json_encode([
+            'success' => true,
+            'data' => [
+                'usuario' => [
+                    'idUsuario' => $idUsuario,
+                    'correo_electronico' => $correo,
+                    'ultimo_acceso' => date('Y-m-d H:i:s')
+                ]
+            ]
+        ]);
+    } else {
+        echo json_encode(['success' => false, 'error' => 'Error al guardar en la base de datos.']);
+    }
+    exit;
+}

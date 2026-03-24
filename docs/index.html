@@ -33,8 +33,14 @@
         <span class="form-error hidden" id="err-pass"></span>
       </div>
       <div id="err-general" class="form-error hidden" style="margin-bottom:12px;"></div>
-      <div style="font-size:.77rem;color:var(--t2);text-align:right;margin-bottom:14px;">
-        Demo: admin@fintrack.mx / fintrack123
+      <div class="form-group hidden" id="group-pass-confirm">
+        <label class="form-label">Confirmar Contraseña</label>
+        <input id="login-pass-confirm" type="password" class="form-input" placeholder="Repite la contraseña"/>
+      </div>
+      <div id="err-general" class="form-error hidden" style="margin-bottom:12px;"></div>
+      
+      <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom:14px;">
+        <a href="#" id="toggle-auth-mode" style="font-size:.8rem;color:var(--accent);text-decoration:none;">Crear una cuenta nueva</a>
       </div>
       <button class="btn btn-primary" id="btn-login">
         <span id="btn-login-text">Iniciar sesión</span>
