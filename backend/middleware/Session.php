@@ -26,7 +26,7 @@ class Session {
                 'lifetime' => 86400,
                 'path' => '/',
                 'domain' => '',           // Lo dejamos vacío para que detecte Cloudflare
-                'secure' => false,         // Obliga a usar HTTPS
+                'secure' => true,         // Obliga a usar HTTPS
                 'httponly' => true,       // Protege contra ataques XSS en Javascript
                 'samesite' => 'None'      // LA MAGIA: Permite el cruce entre GitHub y Cloudflare
             ]);
