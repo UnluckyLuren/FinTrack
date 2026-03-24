@@ -645,7 +645,7 @@ const App = (() => {
       else Toast.show(r.error||'Error.','error');
     },
 
-    exportarDatos(){window.open('./api/perfil.php?action=exportar','_blank');},
+    exportarDatos(){window.open(ApiClient.BASE + '/perfil.php?action=exportar', '_blank');},
 
     openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';},
     closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
