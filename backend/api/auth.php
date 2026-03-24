@@ -100,7 +100,8 @@ switch ($action) {
             $idUsuario = $db->lastInsertId();
             
             // 3. Crear una cuenta (billetera) base
-            $stmtCuenta = $db->prepare("INSERT INTO cuentas (id_usuario, tipo, nombre_institucion, saldo_actual) VALUES (?, 'efectivo', 'Mi Billetera', 0)");
+    
+            $stmtCuenta = $db->prepare("INSERT INTO cuentas (id_usuario, tipo, nombre_institucion, saldo_actual) VALUES (?, 'débito', 'Mi Billetera', 0)");
             $stmtCuenta->execute([$idUsuario]);
             
             // 4. Iniciar sesión automáticamente
