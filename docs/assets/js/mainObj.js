@@ -4,7 +4,7 @@
    API CLIENT — Comunicación con backend PHP
    ============================================================ */
 class ApiClient {
-  static BASE = 'https://thomas-partial-carolina-analyst.trycloudflare.com/api';
+  static BASE = 'https://plymouth-furniture-traditional-brochure.trycloudflare.com/api';
 
   static async request(endpoint, method = 'GET', body = null) {
     const opts = {
