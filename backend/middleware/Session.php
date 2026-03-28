@@ -3,12 +3,16 @@
  * Session.php — Middleware de sesión y token
  * Genera y valida token de sesión temporal (UC06)
  */
-
-// Encabezados CORS Globales (Permisos para GitHub Pages)
+// Permitir GitHub Pages y cualquier subdominio de Cloudflare para pruebas
 header("Access-Control-Allow-Origin: https://unluckyluren.github.io");
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
 
 // Manejo de peticiones "Preflight"
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
