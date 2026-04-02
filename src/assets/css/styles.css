@@ -155,3 +155,32 @@ tbody tr:last-child td{border-bottom:none;}
 @media(max-width:440px){.stats-grid{grid-template-columns:1fr;}}
 .loading-overlay{position:fixed;inset:0;background:rgba(8,12,20,.8);backdrop-filter:blur(4px);z-index:100;display:grid;place-items:center;}
 .loading-spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+
+/* Estilos Welcome */
+
+.welcome-container {height: 100%;width: 100%;display: flex;justify-content: center;align-items: center;gap: 3em;}
+.welcome-left {height: 100%;width: 45%;display: flex;flex-direction: column;gap: 0.5em;align-items: center;justify-content: center;}
+.first-left {display: flex;align-items: center;gap: 1em;}
+.welcome-text {font-family:'Outfit',sans-serif;font-size:1.6rem;font-weight:400;letter-spacing:-.04em;text-align: center;padding-bottom: 100px;}
+.btns-welcome {display: flex;gap: 16px;margin-top: 28px;max-width: 420px;width: 100%;}
+.welcome-right {flex: 1;display: flex;align-items: center;justify-content: center;position: relative;}
+.welcome-right::before {content: '';position: absolute;width: 800px;height: 700px;background: radial-gradient(circle, var(--acc-glow), transparent 70%);filter: blur(40px);z-index: 0;}
+.preview-card {position: relative;z-index: 2;background: var(--bg-card);border: 1px solid var(--border);border-radius: 20px;padding: 12px;box-shadow: var(--shadow);transform: rotate(-3deg);transition: transform var(--tr);}
+.preview-card:hover {transform: rotate(0deg) scale(1.02);}
+.preview-card img {width: 100%;max-width: 520px;border-radius: 14px;display: block;}
+.btn-welcome {flex: 1;padding: 14px 0;font-size: .95rem;font-family: 'Outfit', sans-serif;letter-spacing: -.01em;}
+.header-login{display: flex; justify-content: space-between;}
+.login-title{font-family:'Outfit',sans-serif;font-size:1.7rem;font-weight:700;margin-bottom:6px;letter-spacing:-.03em;display: flex; gap:5em;}
+
+/* Responsive welcome */
+@media(max-width:768px){
+  .welcome-container{flex-direction:column;gap:2em;padding:20px;}
+  .welcome-left{width:100%;text-align:center;}
+  .welcome-text{font-size:1.4rem;padding-bottom:50px;}
+  .btns-welcome{flex-direction:column;gap:12px;max-width:300px;}
+  .first-left{flex-direction:column;gap:0.5em;}
+  .welcome-right{width:100%;order:1;}
+  .welcome-left{order:2;}
+  .welcome-right::before{width:400px;height:350px;}
+  .preview-card img{max-width:400px;}
+}
