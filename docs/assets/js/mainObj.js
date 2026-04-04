@@ -3,7 +3,7 @@
    API CLIENT — Comunicación con backend PHP
    ============================================================ */
 class ApiClient {
-  static BASE = 'https://fat-reporter-distinguished-river.trycloudflare.com/api';
+  static BASE = 'https://fintrack.curikprojects.me/api';
 
   static async request(endpoint, method = 'GET', body = null) {
     const opts = {
